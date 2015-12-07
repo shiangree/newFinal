@@ -18,10 +18,20 @@ import javax.xml.parsers.*;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 import hudson.XmlFile;
-
+/**
+ * DependencyDiffUtils is used to parse the pom file, generate the diffed result, and convert the result to html page.
+ */
 public class DependencyDiffUtils {
+    /**
+     * generate the diffed result
+     *
+     * @param deplist1 dependencies of build1's pom
+     * @param deplist2 dependencies of build2's pom
+     * @return a map that contains three types of diffed result: added dependency, deleted dependency, and modified dependency
+     */
+
     public static Map<String, ArrayList<Dependency>> diff(ArrayList<Dependency> deplist1,
-            ArrayList<Dependency> deplist2) throws ParserConfigurationException, SAXException, IOException {
+            ArrayList<Dependency> deplist2){
         ArrayList<Dependency> dellist = new ArrayList<Dependency>();
         ArrayList<Dependency> addlist = new ArrayList<Dependency>();
         ArrayList<Dependency> modlist = new ArrayList<Dependency>();
@@ -67,6 +77,9 @@ public class DependencyDiffUtils {
         retlist.put("Deleted", dellist);
         return retlist;
     }
+    /**
+     * generate the CSS for html page
+     */
 
     public static StringBuilder setupCSS() {
         StringBuilder sb = new StringBuilder();
@@ -83,17 +96,34 @@ public class DependencyDiffUtils {
         sb.append("</head>\n");
         return sb;
     }
+    /**
+     * get the version of the given dependency in the other build
+     *
+     * @param deplist dependencies of other build
+     * @param groupId the groupId of the given dependency
+     * @param artifactId the artifactId of the given dependency
+     * @return the version of the dependency in the other build
+     */
 
-    private static String getPrevVersion(ArrayList<Dependency> deplist, String groupId) {
+    private static String getPrevVersion(ArrayList<Dependency> deplist, String groupId, String artifactId) {
         for (Dependency dep : deplist) {
-            if (dep.getGroupId().equals(groupId))
+            if (dep.getGroupId().equals(groupId) && dep.getArtifactId().equals(artifactId))
                 return dep.getVersion();
         }
         return "0";
     }
-
+    /**
+     * generate an html page to display the diffed result
+     *
+     * @param deplist1 dependencies of build1's pom
+     * @param deplist2 dependencies of build2's pom
+     * @param list diffed result
+     * @param prevBuild the previous build
+     * @param currBuild the current build
+     * @return the html page to display the diffed result
+     */
     public static String toHtml(ArrayList<Dependency> deplist1, ArrayList<Dependency> deplist2,
-            Map<String, ArrayList<Dependency>> list, Run<?, ?> build1, Run<?, ?> build2) {
+            Map<String, ArrayList<Dependency>> list, Run<?, ?> prevBuild, Run<?, ?> currBuild) {
         ArrayList<Dependency> modified = list.get("Modified");
         ArrayList<Dependency> added = list.get("Added");
         ArrayList<Dependency> deleted = list.get("Deleted");
@@ -101,21 +131,21 @@ public class DependencyDiffUtils {
 
         html.append("<body>\n");
         html.append("<div>\n");
-        html.append("<div><p><b><font size=\"3\">Comparing the current build #" + build2.getNumber() + " and build #"
-                + build1.getNumber() + "</font></b></p>");
+        html.append("<div><p><b><font size=\"3\">Comparing the current build #" + currBuild.getNumber() + " and build #"
+                + prevBuild.getNumber() + "</font></b></p>");
         html.append("<div class=\"left\">\n");
         html.append("<b>Dependency modified:</b><br />\n");
         for (Dependency dep : modified) {
             html.append("<br> groupId: " + dep.getGroupId() + "</br>\n");
             html.append("<br> artifactId: " + dep.getArtifactId() + "</br>\n");
-            html.append("<br> build #" + build2.getNumber() + " dependency version: " + dep.getVersion() + "</br>\n");
-            html.append("<br> build #" + build1.getNumber() + " dependency version: "
-                    + getPrevVersion(deplist1, dep.getGroupId()));
+            html.append("<br> build #" + currBuild.getNumber() + " dependency version: " + dep.getVersion() + "</br>\n");
+            html.append("<br> build #" + prevBuild.getNumber() + " dependency version: "
+                    + getPrevVersion(deplist1, dep.getGroupId(), dep.getArtifactId()));
             html.append("<hr>\n<br />\n");
         }
         html.append("</div>\n");
         html.append("<div class=\"center\">\n");
-        html.append("<b>Dependency added to build #"+build2.getNumber()+"</b><br />\n");
+        html.append("<b>Dependency added to build #"+currBuild.getNumber()+"</b><br />\n");
         for (Dependency dep : added) {
             html.append("<br> groupId: " + dep.getGroupId() + "</br>\n");
             html.append("<br> artifactId: " + dep.getArtifactId() + "</br>\n");
@@ -124,7 +154,7 @@ public class DependencyDiffUtils {
         }
         html.append("</div>\n");
         html.append("<div class=\"right\">\n");
-        html.append("<b>Dependency deleted from build #"+build1.getNumber()+"</b><br />\n");
+        html.append("<b>Dependency deleted from build #"+prevBuild.getNumber()+"</b><br />\n");
         for (Dependency dep : deleted) {
             html.append("<br> groupId: " + dep.getGroupId() + "</br>\n");
             html.append("<br> artifactId: " + dep.getArtifactId() + "</br>\n");
@@ -137,13 +167,19 @@ public class DependencyDiffUtils {
         html.append("</html>");
         return html.toString();
     }
+    /**
+     * parse the given pom and get all dependencies 
+     *
+     * @param dir the content of the pom file
+     * @return the list that contains all dependencies
+     */
 
-    public static ArrayList<Dependency> parsePom(InputStream dir)
+    public static ArrayList<Dependency> parsePom(InputStream pom)
             throws ParserConfigurationException, SAXException, IOException {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dbBuilder = dbFactory.newDocumentBuilder();
         Document doc = null;
-        doc = dbBuilder.parse(dir);
+        doc = dbBuilder.parse(pom);
         NodeList list = doc.getElementsByTagName("dependency");
         ArrayList<Dependency> alist = new ArrayList<Dependency>();
         System.out.println(list.getLength());
