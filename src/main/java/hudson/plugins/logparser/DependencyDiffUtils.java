@@ -82,15 +82,15 @@ public class DependencyDiffUtils {
         sb.append("</head>\n");
         return sb;
     }
-    private static String getPrevVersion(ArrayList<Dependency> deplist, String groupId)
-    {
-        for(Dependency dep : deplist)
-        {
-            if(dep.getGroupId().equals(groupId))
+
+    private static String getPrevVersion(ArrayList<Dependency> deplist, String groupId) {
+        for (Dependency dep : deplist) {
+            if (dep.getGroupId().equals(groupId))
                 return dep.getVersion();
         }
         return "0";
     }
+
     public static String toHtml(ArrayList<Dependency> deplist1, ArrayList<Dependency> deplist2,
             Map<String, ArrayList<Dependency>> list, Run<?, ?> build1, Run<?, ?> build2) {
         ArrayList<Dependency> modified = list.get("Modified");
@@ -107,8 +107,9 @@ public class DependencyDiffUtils {
         for (Dependency dep : modified) {
             html.append("<br> groupId: " + dep.getGroupId() + "</br>\n");
             html.append("<br> artifactId: " + dep.getArtifactId() + "</br>\n");
-            html.append("<br> build #"+build1.getNumber()+" dependency version: " + dep.getVersion() + "</br>\n");
-            html.append("<br> build #"+build2.getNumber()+" dependency version: " + getPrevVersion(deplist2,dep.getGroupId()));
+            html.append("<br> build #" + build1.getNumber() + " dependency version: " + dep.getVersion() + "</br>\n");
+            html.append("<br> build #" + build2.getNumber() + " dependency version: "
+                    + getPrevVersion(deplist2, dep.getGroupId()));
             html.append("<hr>\n<br />\n");
         }
         html.append("</div>\n");
