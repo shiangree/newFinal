@@ -16,6 +16,8 @@
       <br/>
       <a href="" class="button" id="sourceCodeDiffLink" onclick="return retrieveUrl();">Source Code</a>
       <br/>
+      <a href="" class="button" id="dependencyDiffLink" onclick="return retrieveUrl();">Dependencies</a>
+      <br/>
       <br/>
       <button id="downloadHTML">Download Report</button>
 	  <f:entry>
@@ -54,6 +56,8 @@
             														"logSectionDiffAction" + "/?prevBuild=" + anotherBuildNum;
             document.getElementById("sourceCodeDiffLink").href = currentUrl.substring(0, currentUrl.indexOf("diffbuild")+10) + 
             														"sourceCodeDiffAction" + "/?prevBuild=" + anotherBuildNum;
+            document.getElementById("dependencyDiffLink").href = currentUrl.substring(0, currentUrl.indexOf("diffbuild")+10) +
+            														"pomDepDiffAction" + "/?prevBuild=" + anotherBuildNum;
             return true;
         }
 	  </script>
