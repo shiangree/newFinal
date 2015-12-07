@@ -207,7 +207,6 @@ public class DependencyDiffUtils {
             String artifactId = element.getElementsByTagName("artifactId").item(0).getFirstChild().getNodeValue();
             String version = element.getElementsByTagName("version").item(0).getFirstChild().getNodeValue();
             alist.add(new Dependency(groupId, artifactId, version));
-
         }
         return alist;
     }
