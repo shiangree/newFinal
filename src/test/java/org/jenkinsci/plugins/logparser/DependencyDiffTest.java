@@ -1,6 +1,5 @@
 package org.jenkinsci.plugins.logparser;
 
-
 import hudson.plugins.logparser.Dependency;
 import hudson.plugins.logparser.DependencyDiffUtils;
 import org.junit.Before;
@@ -18,15 +17,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class DependencyDiffTest {
     ArrayList<Dependency> deplist1;
     ArrayList<Dependency> deplist2;
-    Map<String, ArrayList<Dependency>> difflist; 
-    
+    Map<String, ArrayList<Dependency>> difflist;
+
     @Before
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         BufferedReader br1 = new BufferedReader(
                 new FileReader("src/test/resources/org/jenkinsci/plugins/logparser/pom1.xml"));
         BufferedReader br2 = new BufferedReader(
@@ -60,14 +57,16 @@ public class DependencyDiffTest {
         br1.close();
         br2.close();
     }
+
     /**
      * test the diff function from two pom xml files
      * 
-     * @throws SAXException and IOException
+     * @throws SAXException
+     *             and IOException
      */
     @Test
     public void dependencyDiffCoreTest() throws Exception {
-        
+
         ArrayList<Dependency> modified = difflist.get("Modified");
         assertEquals(modified.size(), 2);
         ArrayList<Dependency> added = difflist.get("Added");
@@ -75,6 +74,7 @@ public class DependencyDiffTest {
         ArrayList<Dependency> deleted = difflist.get("Deleted");
         assertEquals(deleted.size(), 1);
     }
+
     /**
      * test the the content of the generated html page
      * 
@@ -83,42 +83,23 @@ public class DependencyDiffTest {
     @Test
     public void dependencyDiffHtmlTest() throws Exception {
         String html = DependencyDiffUtils.toHtml(deplist1, deplist2, difflist, 2, 1);
-        String modifiedcontent ="<b>Dependency modified:</b><br />\n"
-                + "<br> groupId: com.opencsv</br>\n"
-                + "<br> artifactId: opencsv</br>\n"
-                + "<br> build #1 dependency version: 3.2</br>\n"
-                + "<br> build #2 dependency version: 3.5<hr>\n"
-                + "<br />\n"
-                + "<br> groupId: org.apache.struts</br>\n"
-                + "<br> artifactId: struts2-core</br>\n"
-                + "<br> build #1 dependency version: 2.5.20</br>\n"
-                + "<br> build #2 dependency version: 2.3.20<hr>\n"
-                + "<br />\n";
+        String modifiedcontent = "<b>Dependency modified:</b><br />\n" + "<br> groupId: com.opencsv</br>\n"
+                + "<br> artifactId: opencsv</br>\n" + "<br> build #1 dependency version: 3.2</br>\n"
+                + "<br> build #2 dependency version: 3.5<hr>\n" + "<br />\n" + "<br> groupId: org.apache.struts</br>\n"
+                + "<br> artifactId: struts2-core</br>\n" + "<br> build #1 dependency version: 2.5.20</br>\n"
+                + "<br> build #2 dependency version: 2.3.20<hr>\n" + "<br />\n";
         assertTrue(html.contains(modifiedcontent));
         String addedcontent = "<b>Dependency added to build #1</b><br />\n"
-                + "<br> groupId: com.google.code.gson</br>\n"
-                + "<br> artifactId: guice</br>\n"
-                + "<br> version: 4.0</br>\n"
-                + "<hr>\n"
-                + "<br />\n"
-                + "<br> groupId: org.scalatest</br>\n"
-                + "<br> artifactId: scalatest_2.10</br>\n"
-                + "<br> version: 3.0.0-M14</br>\n"
-                + "<hr>\n"
-                + "<br />\n"
-                + "<br> groupId: org.scalatest</br>\n"
-                + "<br> artifactId: scalatest_2.10</br>\n"
-                + "<br> version: 3.0.0-M14</br>\n"
-                + "<hr>\n"
-                + "<br />\n";
+                + "<br> groupId: com.google.code.gson</br>\n" + "<br> artifactId: guice</br>\n"
+                + "<br> version: 4.0</br>\n" + "<hr>\n" + "<br />\n" + "<br> groupId: org.scalatest</br>\n"
+                + "<br> artifactId: scalatest_2.10</br>\n" + "<br> version: 3.0.0-M14</br>\n" + "<hr>\n" + "<br />\n"
+                + "<br> groupId: org.scalatest</br>\n" + "<br> artifactId: scalatest_2.10</br>\n"
+                + "<br> version: 3.0.0-M14</br>\n" + "<hr>\n" + "<br />\n";
         assertTrue(html.contains(addedcontent));
         String deletedcontent = "<b>Dependency deleted from build #2</b><br />\n"
-                + "<br> groupId: com.google.inject</br>\n"
-                + "<br> artifactId: guice</br>\n"
-                + "<br> version: 4.0</br>\n"
-                + "<hr>\n"
-                + "<br />\n";
+                + "<br> groupId: com.google.inject</br>\n" + "<br> artifactId: guice</br>\n"
+                + "<br> version: 4.0</br>\n" + "<hr>\n" + "<br />\n";
         assertTrue(html.contains(deletedcontent));
     }
-    
+
 }
