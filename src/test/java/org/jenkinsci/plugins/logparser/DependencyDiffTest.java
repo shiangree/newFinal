@@ -64,7 +64,7 @@ public class DependencyDiffTest {
         ArrayList<Dependency> modified = difflist.get("Modified");
         assertEquals(modified.size(), 2);
         ArrayList<Dependency> added = difflist.get("Added");
-        assertEquals(added.size(), 1);
+        assertEquals(added.size(), 3);
         ArrayList<Dependency> deleted = difflist.get("Deleted");
         assertEquals(deleted.size(), 0);
     }
