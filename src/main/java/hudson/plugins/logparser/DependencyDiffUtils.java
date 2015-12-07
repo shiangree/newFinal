@@ -36,9 +36,9 @@ public class DependencyDiffUtils {
                 String gid1 = dep1.getGroupId();
                 String aid1 = dep1.getArtifactId();
                 String ver1 = dep1.getVersion();
-                if (gid1.equals(gid2)) {
+                if (gid1.equals(gid2) && aid1.equals(aid2)) {
                     isinlist1 = true;
-                    if (!aid1.equals(aid2) || !ver1.equals(ver2))
+                    if (ver1.equals(ver2))
                         modlist.add(new Dependency(gid2, aid2, ver2));
                 }
             }
@@ -55,7 +55,8 @@ public class DependencyDiffUtils {
             boolean isinlist2 = false;
             for (Dependency dep2 : deplist2) {
                 String gid2 = dep2.getGroupId();
-                if (gid2.equals(gid1)) {
+                String aid2 = dep2.getArtifactId();
+                if (gid2.equals(gid1) && aid2.equals(aid1)) {
                     isinlist2 = true;
                 }
             }
