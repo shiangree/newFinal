@@ -62,7 +62,7 @@ public class DependencyDiffTest {
         ArrayList<Dependency> deplist2 = DependencyDiffUtils.parsePom(in2);
         Map<String, ArrayList<Dependency>> difflist = DependencyDiffUtils.diff(deplist1, deplist2);
         ArrayList<Dependency> modified = difflist.get("Modified");
-        assertEquals(modified.size(), 0);
+        assertEquals(modified.size(), 2);
         ArrayList<Dependency> added = difflist.get("Added");
         assertEquals(added.size(), 1);
         ArrayList<Dependency> deleted = difflist.get("Deleted");
