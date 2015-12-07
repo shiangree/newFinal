@@ -38,7 +38,7 @@ public class DependencyDiffUtils {
                 String ver1 = dep1.getVersion();
                 if (gid1.equals(gid2) && aid1.equals(aid2)) {
                     isinlist1 = true;
-                    if (ver1.equals(ver2))
+                    if (!ver1.equals(ver2))
                         modlist.add(new Dependency(gid2, aid2, ver2));
                 }
             }
