@@ -1,0 +1,63 @@
+package hudson.plugins.logparser;
+
+import org.kohsuke.stapler.Stapler;
+import org.kohsuke.stapler.bind.JavaScriptMethod;
+import com.google.gson.Gson;
+
+import hudson.model.Action;
+import hudson.model.Run;
+
+/**
+ * DependencyDiffAction is the action to diff dependencies in POM.xml between
+ * two builds.
+ */
+public class DependencyDiffAction implements Action {
+    final private Run<?, ?> thisBuild;
+    private String thatBuild;
+    public String html;
+    public String fileName;
+    public DependencyDiffAction(Run<?, ?> build) throws Exception {
+
+        this.thisBuild = build;
+        this.thatBuild = Stapler.getCurrentRequest().getParameter("prevBuild");
+        Run<?, ?> that = thisBuild.getParent().getBuildByNumber(Integer.parseInt(this.thatBuild));
+    	this.html = RootPomDiff.toHtml(RootPomDiff.compare(that, thisBuild));
+   	this.fileName = "build_" + that.getNumber() + "_" + thisBuild.getNumber() + "_dependency_diff.html";
+     }
+
+    public Run<?, ?> getOwner() {
+        return this.thisBuild;
+    }
+
+    public String getPrevBuild() {
+        return this.thatBuild;
+    }
+
+    public String getHtml() {
+        return this.html;
+    }
+
+    @JavaScriptMethod
+    public String exportHtml() {
+    	return this.html;
+    }
+
+    @JavaScriptMethod
+    public String exportFileName() {
+	return this.fileName;
+    }
+    @Override
+    public String getIconFileName() {
+        return "";
+    }
+
+    @Override
+    public String getDisplayName() {
+        return "DependencyDiff Page";
+    }
+
+    @Override
+    public String getUrlName() {
+        return "dependencyDiff";
+    }
+}

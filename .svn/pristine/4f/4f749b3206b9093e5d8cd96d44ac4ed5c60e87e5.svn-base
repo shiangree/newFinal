@@ -1,0 +1,235 @@
+package hudson.plugins.logparser;
+import java.util.*;
+
+import org.apache.maven.artifact.Artifact;
+
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.Run;
+import jenkins.model.ArtifactManager;
+import javax.xml.*;
+import javax.xml.parsers.*;
+
+import org.w3c.dom.*;
+import org.xml.sax.SAXException;
+
+import com.google.gson.Gson;
+
+import java.io.*;
+
+public class RootPomDiff {
+	
+
+	
+	private ArrayList<Dependency> depList1 = new ArrayList<Dependency>();
+	private ArrayList<Dependency> depList2 = new ArrayList<Dependency>();
+	
+	public static void setList(Run<?,?> build2) throws IOException
+	{
+		String build2path = build2.getLogFile().getAbsolutePath();
+		System.out.println("\n\n=======================================================\n");
+		
+		int idx1 = build2path.lastIndexOf("build");
+		String dir = build2path.substring(0,idx1);
+		dir = dir+"workspace";
+		//System.out.println(dir);
+				
+		build2path = build2path.substring(0,build2path.length()-3);
+		ArrayList<String> alist = new ArrayList<String>();
+		findFiles(dir,alist);
+		dir = alist.get(0);
+		System.out.println(dir);
+		BufferedReader br = new BufferedReader(new FileReader(dir));
+		BufferedWriter bw = new BufferedWriter(new FileWriter(build2path+"pom.xml"));
+		String line;
+		while((line = br.readLine()) != null) 
+		{
+			bw.write(line);
+			bw.write("\n");
+			System.out.println(line);
+		}
+		bw.flush();
+		bw.close();
+		br.close();
+		System.out.println("\n\n=======================================================\n");
+
+		
+	}
+
+	public static Map<String, ArrayList<Dependency>> compare(Run<?,?> build1, Run<?,?> build2) throws Exception
+	{
+System.out.println("\n============================================================\n");
+		System.out.println("Comparing build "+build1.getNumber()+" and build "+build2.getNumber());
+		
+		String build1path = build1.getLogFile().getAbsolutePath();
+		String build2path = build2.getLogFile().getAbsolutePath();
+		
+		build1path = build1path.substring(0,build1path.length()-3);
+		build1path = build1path+"pom.xml";
+		ArrayList<Dependency> deplist1 = parsePom(build1path);
+		
+		build2path = build2path.substring(0,build2path.length()-3);
+		build2path = build2path+"pom.xml";
+		
+		ArrayList<Dependency> deplist2 = parsePom(build2path);
+		System.out.println("The paths of the poms are:\n"+build2path+"\n"+build1path);
+		for(Dependency dep : deplist1)
+		{
+			System.out.print(dep.getGroupId()+" ");
+		}
+		System.out.println("\n");
+		for(Dependency dep : deplist2)
+		{
+			System.out.print(dep.getGroupId()+" ");
+		}
+		System.out.println();
+		return diff(deplist1, deplist2);
+		
+	}	
+		public static Map<String, ArrayList<Dependency>> diff(ArrayList<Dependency> deplist1, ArrayList<Dependency> deplist2) throws ParserConfigurationException, SAXException, IOException
+		{
+			ArrayList<Dependency> dellist = new ArrayList<Dependency>();
+			ArrayList<Dependency> addlist = new ArrayList<Dependency>();
+			ArrayList<Dependency> modlist = new ArrayList<Dependency>();
+			Map<String,ArrayList<Dependency>> retlist = new HashMap<String, ArrayList<Dependency>>();
+			for(int i=0;i<deplist2.size();++i)
+			{
+				Dependency dep2 = deplist2.get(i);
+				String gid2 = dep2.getGroupId();
+				String aid2 = dep2.getArtifactId();
+				String ver2 = dep2.getVersion();
+				boolean isinlist1 = false;
+				for(Dependency dep1 : deplist1)
+				{
+					String gid1 = dep1.getGroupId();
+					String aid1 = dep1.getArtifactId();
+					String ver1 = dep1.getVersion();
+					if(gid1.equals(gid2))
+					{	
+						isinlist1 = true;
+						if(!aid1.equals(aid2) || !ver1.equals(ver2))
+							modlist.add(new Dependency(gid2, aid2, ver2));
+					}
+				}
+				if(!isinlist1)
+					addlist.add(new Dependency(gid2,aid2,ver2));	
+			}
+			retlist.put("Modified",modlist);
+	        	retlist.put("Added", addlist);
+			for(int i=0;i<deplist1.size();++i)
+			{
+                                Dependency dep1 = deplist1.get(i);
+                                String gid1 = dep1.getGroupId();
+                                String aid1 = dep1.getArtifactId();
+                                String ver1 = dep1.getVersion();
+                                boolean isinlist2 = false;
+				for(Dependency dep2 : deplist2)
+				{
+                                        String gid2 = dep2.getGroupId();
+                                        String aid2 = dep2.getArtifactId();
+                                        String ver2 = dep2.getVersion();
+                                        if(gid2.equals(gid1))
+                                        {
+                                                isinlist2 = true;
+                                        }
+				}
+				if(!isinlist2)
+					dellist.add(new Dependency(gid1, aid1, ver1));
+				
+			}
+		System.out.println("modified dependencies:");
+                System.out.println(new Gson().toJson(modlist));
+                System.out.println("added dependencies:");
+                System.out.println(new Gson().toJson(addlist));
+		System.out.println("deleted dependencies:");	
+		System.out.println(new Gson().toJson(dellist));
+			System.out.println("\n===================================================\n");      
+			retlist.put("Deleted",dellist);
+			return retlist;
+		}
+	
+	    public static String toHtml(Map<String, ArrayList<Dependency>> list)
+	    {
+	    	String html="<br />";
+		ArrayList<Dependency> modified = list.get("Modified");
+		ArrayList<Dependency> added = list.get("Added");
+		ArrayList<Dependency> deleted = list.get("Deleted");
+		html += "<font color = blue><b>Dependency modified:</b></font><br />";
+		for(Dependency dep : modified)
+		{
+			html += "<br> groupId: " + dep.getGroupId()+"</br>";
+			html += "<br> artifactId: " + dep.getArtifactId()+"</br>";
+			html += "<br> version: " + dep.getVersion()+"</br>"; 
+			html += "<br />";	
+		}
+		html += "<br />";
+		html += "<font color = green><b>Dependency added:</b></font><br />";
+		for(Dependency dep : added)
+		{
+                        html += "<br> groupId: " + dep.getGroupId()+"</br>";
+                        html += "<br> artifactId: " + dep.getArtifactId()+"</br>";     
+                        html += "<br> version: " + dep.getVersion()+"</br>";
+                        html += "<br />";
+		}
+                html += "<br />";
+                html += "<font color = red><b>Dependency deleted:</b></font><br />";
+                for(Dependency dep : deleted)
+                {
+                        html += "<br> groupId: " + dep.getGroupId()+"</br>";
+                        html += "<br> artifactId: " + dep.getArtifactId()+"</br>";
+                        html += "<br> version: " + dep.getVersion()+"</br>";
+                        html += "<br />";
+                }
+		return html;
+	    } 	
+	    public static void findFiles(String baseDirName, ArrayList<String> currPath) 
+	    {
+	        String tempName = null;
+	        File baseDir = new File(baseDirName);
+	        String path = null;
+	        if (!baseDir.exists() || !baseDir.isDirectory()){
+	            System.out.println("Can't find file: " + baseDirName + "is not a directory");
+	        } else {
+	        	String[] filelist = baseDir.list();
+	    	    for (int i = 0; i < filelist.length; i++) {
+	    	    	File readfile = new File(baseDirName + "/" + filelist[i]);
+	    	        if(!readfile.isDirectory()) {
+	    	        	tempName =  readfile.getName(); 
+	                    if (tempName.equals("pom.xml")) {
+				//System.out.println("FOUND!\n"+readfile.getAbsolutePath());
+	                        currPath.add(readfile.getAbsolutePath()); 
+	                    }
+	    	        } else if(readfile.isDirectory()){
+	    	        	findFiles(baseDirName + "/" + filelist[i],currPath);
+	    	        }
+	    	    }
+	        }
+	        
+	    }
+	    
+	    
+	    
+		public static ArrayList<Dependency> parsePom(String dir) throws ParserConfigurationException, SAXException, IOException  {
+		    DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		    DocumentBuilder dbBuilder = dbFactory.newDocumentBuilder();
+		    Document doc = null;
+			doc = dbBuilder.parse(dir);
+			NodeList list = doc.getElementsByTagName("dependency");
+			ArrayList<Dependency> alist = new ArrayList<Dependency>();
+			System.out.println(list.getLength());
+			for(int i = 0; i< list.getLength() ; i ++){
+				Element element = (Element)list.item(i);
+				String groupId=element.getElementsByTagName("groupId").item(0).getFirstChild().getNodeValue();
+				String artifactId=element.getElementsByTagName("artifactId").item(0).getFirstChild().getNodeValue();
+				String version=element.getElementsByTagName("version").item(0).getFirstChild().getNodeValue();
+				alist.add(new Dependency(groupId, artifactId, version));
+
+			}
+			return alist;
+	  	}
+	
+	
+	
+	
+}
+

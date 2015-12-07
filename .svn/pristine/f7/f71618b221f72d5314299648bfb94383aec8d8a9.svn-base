@@ -1,0 +1,30 @@
+LogParser Plugin
+
+This plugin will parse the console output and show the information needed by the parse rule provided by user.
+We will need this plugin for parsing and diffing the console output.
+
+How does this plugin work?
+
+LogParserParser: the parser object
+
+	HashMap statusCount: count the lines of each type in the console output, specified by LogParserConsts
+	LogParserConsts: the object that contains 6 types of information: ERROR, WARNING, INFO, NONE, START, DEFAULT
+	parseLog(): create the parsed log file (log.html) by calling parseLogBody()
+	parseLogBody(): open the console outupt file and parse it line by line (BufferedReader)
+
+LogParserPublisher: member function perform()
+perform(): 1. create parser with rules
+           2. parse the log
+           3. mark build as faild or unstable if necessary by checking the log file made in step 2
+           4. add an action created with above results
+
+What we can do to modify this plugin for our purposes?
+
+Purpose: diff the console outputs
+How: The logparse plugin has generated the parsed output and gather the output information by types
+	 Therefore, we now have the parsed output. We have two choices:
+	 	1. each time we parse, we save the parsed output as JSON object for comparison; or
+	 	2. each time we parse, we save the parsed output as plain text for comparison.
+	 For diff, we will need to check the differences for each type of information.
+	 
+
