@@ -54,8 +54,6 @@ public class DependencyDiffUtils {
             boolean isinlist2 = false;
             for (Dependency dep2 : deplist2) {
                 String gid2 = dep2.getGroupId();
-                String aid2 = dep2.getArtifactId();
-                String ver2 = dep2.getVersion();
                 if (gid2.equals(gid1)) {
                     isinlist2 = true;
                 }
@@ -64,13 +62,6 @@ public class DependencyDiffUtils {
                 dellist.add(new Dependency(gid1, aid1, ver1));
 
         }
-        System.out.println("modified dependencies:");
-        System.out.println(new Gson().toJson(modlist));
-        System.out.println("added dependencies:");
-        System.out.println(new Gson().toJson(addlist));
-        System.out.println("deleted dependencies:");
-        System.out.println(new Gson().toJson(dellist));
-        System.out.println("\n===================================================\n");
         retlist.put("Deleted", dellist);
         return retlist;
     }
@@ -92,7 +83,7 @@ public class DependencyDiffUtils {
     }
 
     public static String toHtml(ArrayList<Dependency> deplist1, ArrayList<Dependency> deplist2,
-            Map<String, ArrayList<Dependency>> list) {
+            Map<String, ArrayList<Dependency>> list, int buildNumber1, int buildNumber2) {
         ArrayList<Dependency> modified = list.get("Modified");
         ArrayList<Dependency> added = list.get("Added");
         ArrayList<Dependency> deleted = list.get("Deleted");
