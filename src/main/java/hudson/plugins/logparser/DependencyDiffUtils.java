@@ -107,8 +107,8 @@ public class DependencyDiffUtils {
         for (Dependency dep : modified) {
             html.append("<br> groupId: " + dep.getGroupId() + "</br>\n");
             html.append("<br> artifactId: " + dep.getArtifactId() + "</br>\n");
-            html.append("<br> build #" + build1.getNumber() + " dependency version: " + dep.getVersion() + "</br>\n");
-            html.append("<br> build #" + build2.getNumber() + " dependency version: "
+            html.append("<br> build #" + build2.getNumber() + " dependency version: " + dep.getVersion() + "</br>\n");
+            html.append("<br> build #" + build1.getNumber() + " dependency version: "
                     + getPrevVersion(deplist1, dep.getGroupId()));
             html.append("<hr>\n<br />\n");
         }
