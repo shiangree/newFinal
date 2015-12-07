@@ -100,8 +100,8 @@ public class DependencyDiffUtils {
 
         html.append("<body>\n");
         html.append("<div>\n");
-        html.append("<div><p><b><font size=\"3\">Comparing the current build #" + build1.getNumber() + " and build #"
-                + build2.getNumber() + "</font></b></p>");
+        html.append("<div><p><b><font size=\"3\">Comparing the current build #" + build2.getNumber() + " and build #"
+                + build1.getNumber() + "</font></b></p>");
         html.append("<div class=\"left\">\n");
         html.append("<b>Dependency modified:</b><br />\n");
         for (Dependency dep : modified) {
