@@ -24,10 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * In this test suite we initialize the Job workspaces with a resource
- * (maven-project1.zip) that contains a Maven project.
- */
-public class DependencyDiffTest {
+ * test the diff function from two pom xml files
+ * 
+ * @throws SAXException and IOException
+ */public class DependencyDiffTest {
 
     @Test
     public void Pomdifftest() throws Exception {
