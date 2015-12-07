@@ -1,4 +1,5 @@
 package hudson.plugins.logparser;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +84,7 @@ public class DependencyDiffUtils {
     }
 
     public static String toHtml(ArrayList<Dependency> deplist1, ArrayList<Dependency> deplist2,
-            Map<String, ArrayList<Dependency>> list, int buildNumber1, int buildNumber2) {
+            Map<String, ArrayList<Dependency>> list, Run<?, ?> build1, Run<?, ?> build2) {
         ArrayList<Dependency> modified = list.get("Modified");
         ArrayList<Dependency> added = list.get("Added");
         ArrayList<Dependency> deleted = list.get("Deleted");
@@ -91,13 +92,15 @@ public class DependencyDiffUtils {
 
         html.append("<body>\n");
         html.append("<div>\n");
+        html.append("<div><p><b><font size=\"3\">Comparing the current build #" + build1.getNumber() + "and build #"
+                + build2.getNumber() + "</font></b></p>");
         html.append("<div class=\"left\">\n");
         html.append("<b>Dependency modified:</b><br />\n");
         for (Dependency dep : modified) {
             html.append("<br> groupId: " + dep.getGroupId() + "</br>\n");
             html.append("<br> artifactId: " + dep.getArtifactId() + "</br>\n");
             html.append("<br> version: " + dep.getVersion() + "</br>\n");
-    	    html.append("<hr>\n<br />\n");
+            html.append("<hr>\n<br />\n");
         }
         html.append("</div>\n");
         html.append("<div class=\"center\">\n");
@@ -144,5 +147,3 @@ public class DependencyDiffUtils {
         return alist;
     }
 }
-
-
