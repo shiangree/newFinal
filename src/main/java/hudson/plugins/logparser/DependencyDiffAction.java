@@ -27,15 +27,22 @@ public class DependencyDiffAction implements Action {
     public String html;
     private final Run<?, ?> owner;
     public String fileName;
+
     /**
      * Construct a dependency diff action
      *
-     * @param job the project
-     * @param build1 build number 1
-     * @param build2 build number 2
-     * @param launcher launcher
-     * @param workspace path to workspace
-     * @throws Exception if SCM fails to checkout
+     * @param job
+     *            the project
+     * @param build1
+     *            build number 1
+     * @param build2
+     *            build number 2
+     * @param launcher
+     *            launcher
+     * @param workspace
+     *            path to workspace
+     * @throws Exception
+     *             if SCM fails to checkout
      */
     public DependencyDiffAction(Job<?, ?> job, int build1, int build2, Launcher launcher, FilePath workspace)
             throws Exception {
