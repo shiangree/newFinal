@@ -163,25 +163,26 @@ public class DependencyDiffUtils {
         html.append("<div class=\"center\">\n");
         html.append("<b>Dependency added to build #" + currBuildNumber + "</b><br />\n");
         for (Dependency dep : added) {
-            html.append("<br> groupId: " + dep.getGroupId() + "</br>\n");
-            html.append("<br> artifactId: " + dep.getArtifactId() + "</br>\n");
-            html.append("<br> version: " + dep.getVersion() + "</br>\n");
-            html.append("<hr>\n<br />\n");
+            addDepInfoToHtml(html, dep);
         }
         html.append("</div>\n");
         html.append("<div class=\"right\">\n");
         html.append("<b>Dependency deleted from build #" + prevBuildNumber + "</b><br />\n");
         for (Dependency dep : deleted) {
-            html.append("<br> groupId: " + dep.getGroupId() + "</br>\n");
-            html.append("<br> artifactId: " + dep.getArtifactId() + "</br>\n");
-            html.append("<br> version: " + dep.getVersion() + "</br>\n");
-            html.append("<hr>\n<br />\n");
+            addDepInfoToHtml(html, dep);
         }
         html.append("</div>\n");
         html.append("</div>\n");
         html.append("</body>\n");
         html.append("</html>");
         return html.toString();
+    }
+
+    private static void addDepInfoToHtml(StringBuilder html, Dependency dep) {
+        html.append("<br> groupId: " + dep.getGroupId() + "</br>\n");
+        html.append("<br> artifactId: " + dep.getArtifactId() + "</br>\n");
+        html.append("<br> version: " + dep.getVersion() + "</br>\n");
+        html.append("<hr>\n<br />\n");
     }
 
     /**
