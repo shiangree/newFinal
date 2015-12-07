@@ -4,6 +4,7 @@ import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.bind.JavaScriptMethod;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
@@ -66,21 +67,10 @@ public class DependencyDiffAction implements Action {
         }
         List<String> contentlist1 = pomcontent1.get(pomPath);
         List<String> contentlist2 = pomcontent2.get(pomPath);
-
-        ByteArrayOutputStream baos1 = new ByteArrayOutputStream();
-        ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-        for (String s : contentlist1) {
-            baos1.write(s.getBytes());
-        }
-        for (String s : contentlist2) {
-            baos2.write(s.getBytes());
-        }
-
-        byte[] bytes1 = baos1.toByteArray();
-        InputStream in1 = new ByteArrayInputStream(bytes1);
+        
+        InputStream in1 = getInStream(contentlist1);
         ArrayList<Dependency> deplist1 = DependencyDiffUtils.parsePom(in1);
-        byte[] bytes2 = baos2.toByteArray();
-        InputStream in2 = new ByteArrayInputStream(bytes2);
+        InputStream in2 = getInStream(contentlist2);
         ArrayList<Dependency> deplist2 = DependencyDiffUtils.parsePom(in2);
         br.close();
         this.html += DependencyDiffUtils.toHtml(deplist1, deplist2, DependencyDiffUtils.diff(deplist1, deplist2),
@@ -88,7 +78,18 @@ public class DependencyDiffAction implements Action {
         this.fileName = "dependency_diff.html";
 
     }
-
+    
+    private InputStream getInStream(List<String> contentlist) throws IOException
+    {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        for(String s : contentlist)
+        {
+            baos.write(s.getBytes());
+        }
+        byte[] bytes = baos.toByteArray();
+        return new ByteArrayInputStream(bytes);
+    }
+    
     public Run<?, ?> getOwner() {
         return this.owner;
     }
