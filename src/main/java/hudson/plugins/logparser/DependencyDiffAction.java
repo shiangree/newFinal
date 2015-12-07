@@ -77,7 +77,7 @@ public class DependencyDiffAction implements Action {
         ArrayList<Dependency> deplist2 = DependencyDiffUtils.parsePom(in2);
         br.close();
         this.html += DependencyDiffUtils.toHtml(deplist1, deplist2, DependencyDiffUtils.diff(deplist1, deplist2),
-                owner, prevBuild);
+                owner.getNumber(), prevBuild.getNumber());
         this.fileName = "dependency_diff.html";
 
     }

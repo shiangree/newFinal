@@ -123,7 +123,7 @@ public class DependencyDiffUtils {
      * @return the html page to display the diffed result
      */
     public static String toHtml(ArrayList<Dependency> deplist1, ArrayList<Dependency> deplist2,
-            Map<String, ArrayList<Dependency>> list, Run<?, ?> prevBuild, Run<?, ?> currBuild) {
+            Map<String, ArrayList<Dependency>> list, int prevBuildNumber, int currBuildNumber) {
         ArrayList<Dependency> modified = list.get("Modified");
         ArrayList<Dependency> added = list.get("Added");
         ArrayList<Dependency> deleted = list.get("Deleted");
@@ -131,21 +131,21 @@ public class DependencyDiffUtils {
 
         html.append("<body>\n");
         html.append("<div>\n");
-        html.append("<div><p><b><font size=\"3\">Comparing the current build #" + currBuild.getNumber() + " and build #"
-                + prevBuild.getNumber() + "</font></b></p>");
+        html.append("<div><p><b><font size=\"3\">Comparing the current build #" + currBuildNumber + " and build #"
+                + prevBuildNumber + "</font></b></p>");
         html.append("<div class=\"left\">\n");
         html.append("<b>Dependency modified:</b><br />\n");
         for (Dependency dep : modified) {
             html.append("<br> groupId: " + dep.getGroupId() + "</br>\n");
             html.append("<br> artifactId: " + dep.getArtifactId() + "</br>\n");
-            html.append("<br> build #" + currBuild.getNumber() + " dependency version: " + dep.getVersion() + "</br>\n");
-            html.append("<br> build #" + prevBuild.getNumber() + " dependency version: "
+            html.append("<br> build #" + currBuildNumber + " dependency version: " + dep.getVersion() + "</br>\n");
+            html.append("<br> build #" + prevBuildNumber + " dependency version: "
                     + getPrevVersion(deplist1, dep.getGroupId(), dep.getArtifactId()));
             html.append("<hr>\n<br />\n");
         }
         html.append("</div>\n");
         html.append("<div class=\"center\">\n");
-        html.append("<b>Dependency added to build #"+currBuild.getNumber()+"</b><br />\n");
+        html.append("<b>Dependency added to build #"+currBuildNumber+"</b><br />\n");
         for (Dependency dep : added) {
             html.append("<br> groupId: " + dep.getGroupId() + "</br>\n");
             html.append("<br> artifactId: " + dep.getArtifactId() + "</br>\n");
@@ -154,7 +154,7 @@ public class DependencyDiffUtils {
         }
         html.append("</div>\n");
         html.append("<div class=\"right\">\n");
-        html.append("<b>Dependency deleted from build #"+prevBuild.getNumber()+"</b><br />\n");
+        html.append("<b>Dependency deleted from build #"+prevBuildNumber+"</b><br />\n");
         for (Dependency dep : deleted) {
             html.append("<br> groupId: " + dep.getGroupId() + "</br>\n");
             html.append("<br> artifactId: " + dep.getArtifactId() + "</br>\n");
