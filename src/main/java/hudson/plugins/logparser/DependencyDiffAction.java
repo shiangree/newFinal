@@ -2,13 +2,11 @@ package hudson.plugins.logparser;
 
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.bind.JavaScriptMethod;
-import com.google.gson.Gson;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
-import java.lang.Integer;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
