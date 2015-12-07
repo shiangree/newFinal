@@ -115,7 +115,7 @@ public class DependencyDiffUtils {
         }
         html.append("</div>\n");
         html.append("<div class=\"center\">\n");
-        html.append("<b>Dependency added:</b><br />\n");
+        html.append("<b>Dependency added to build #"+build2.getNumber()+"</b><br />\n");
         for (Dependency dep : added) {
             html.append("<br> groupId: " + dep.getGroupId() + "</br>\n");
             html.append("<br> artifactId: " + dep.getArtifactId() + "</br>\n");
@@ -124,7 +124,7 @@ public class DependencyDiffUtils {
         }
         html.append("</div>\n");
         html.append("<div class=\"right\">\n");
-        html.append("<b>Dependency deleted:</b><br />\n");
+        html.append("<b>Dependency deleted from build #"+build1.getNumber()+"</b><br />\n");
         for (Dependency dep : deleted) {
             html.append("<br> groupId: " + dep.getGroupId() + "</br>\n");
             html.append("<br> artifactId: " + dep.getArtifactId() + "</br>\n");
