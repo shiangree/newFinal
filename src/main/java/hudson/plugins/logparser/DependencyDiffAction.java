@@ -25,61 +25,62 @@ import hudson.model.Job;
  * two builds.
  */
 public class DependencyDiffAction implements Action {
-    private Run<?,?> thisBuild;
-    private String thatBuild;
+    private Run<?, ?> prevBuild;
     public String html;
     private final Run<?, ?> owner;
     public String fileName;
-    public DependencyDiffAction(Job<?, ?> job, int build1, int build2, Launcher launcher,
-            FilePath workspace) throws Exception {
-this.owner = job.getBuildByNumber(build1);
-        Map<String, List<String>> pomcontent1 = SCMUtils.getFilesFromBuild("pom.xml", (AbstractProject<?, ?>) job, build1, launcher, workspace);
-    	Map<String, List<String>> pomcontent2 = SCMUtils.getFilesFromBuild("pom.xml", (AbstractProject<?, ?>) job, build2, launcher, workspace);
-	this.html = "";
-	
+
+    public DependencyDiffAction(Job<?, ?> job, int build1, int build2, Launcher launcher, FilePath workspace)
+            throws Exception {
+        this.prevBuild = job.getBuildByNumber(build2);
+        this.owner = job.getBuildByNumber(build1);
+        Map<String, List<String>> pomcontent1 = SCMUtils.getFilesFromBuild("pom.xml", (AbstractProject<?, ?>) job,
+                build1, launcher, workspace);
+        Map<String, List<String>> pomcontent2 = SCMUtils.getFilesFromBuild("pom.xml", (AbstractProject<?, ?>) job,
+                build2, launcher, workspace);
+        this.html = "";
+
         String configPath = job.getConfigFile().getFile().getAbsolutePath();
         BufferedReader br = new BufferedReader(new FileReader(configPath));
-	String line;
-	String pomPath="null";
-	while((line = br.readLine()) != null)
-	{
-		if(line.contains("pom.xml"))
-		{
-			pomPath =line.substring(line.indexOf("<rootPOM>")+9,line.indexOf("</rootPOM>")).trim();
-			break;
-		}
-	} 
-	List<String> contentlist1 = pomcontent1.get(pomPath);
-	List<String> contentlist2 = pomcontent2.get(pomPath);
+        String line;
+        String pomPath = "null";
+        while ((line = br.readLine()) != null) {
+            if (line.contains("pom.xml")) {
+                pomPath = line.substring(line.indexOf("<rootPOM>") + 9, line.indexOf("</rootPOM>")).trim();
+                break;
+            }
+        }
+        List<String> contentlist1 = pomcontent1.get(pomPath);
+        List<String> contentlist2 = pomcontent2.get(pomPath);
 
-	ByteArrayOutputStream baos1 = new ByteArrayOutputStream();
-	ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-	for (String s : contentlist1) {
-   		baos1.write(s.getBytes());
- 	}
-	for (String s : contentlist2) {
-		baos2.write(s.getBytes());
-	}
+        ByteArrayOutputStream baos1 = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+        for (String s : contentlist1) {
+            baos1.write(s.getBytes());
+        }
+        for (String s : contentlist2) {
+            baos2.write(s.getBytes());
+        }
 
-	
-	byte[] bytes1 = baos1.toByteArray();	
-	InputStream in1 = new ByteArrayInputStream(bytes1);
-	ArrayList<Dependency> deplist1 = DependencyDiffUtils.parsePom(in1);
-	byte[] bytes2 = baos2.toByteArray();
-	InputStream in2 = new ByteArrayInputStream(bytes2);
-	ArrayList<Dependency> deplist2 = DependencyDiffUtils.parsePom(in2);
-	br.close();
-	this.html+=DependencyDiffUtils.toHtml(deplist1, deplist2, DependencyDiffUtils.diff(deplist1, deplist2));
-   	this.fileName = "dependency_diff.html";
-    
+        byte[] bytes1 = baos1.toByteArray();
+        InputStream in1 = new ByteArrayInputStream(bytes1);
+        ArrayList<Dependency> deplist1 = DependencyDiffUtils.parsePom(in1);
+        byte[] bytes2 = baos2.toByteArray();
+        InputStream in2 = new ByteArrayInputStream(bytes2);
+        ArrayList<Dependency> deplist2 = DependencyDiffUtils.parsePom(in2);
+        br.close();
+        this.html += DependencyDiffUtils.toHtml(deplist1, deplist2, DependencyDiffUtils.diff(deplist1, deplist2),
+                build1, build2);
+        this.fileName = "dependency_diff.html";
+
     }
 
     public Run<?, ?> getOwner() {
         return this.owner;
     }
 
-    public String getPrevBuild() {
-        return this.thatBuild;
+    public Run<?, ?> getPrevBuild() {
+        return this.prevBuild;
     }
 
     public String getHtml() {
@@ -88,13 +89,14 @@ this.owner = job.getBuildByNumber(build1);
 
     @JavaScriptMethod
     public String exportHtml() {
-    	return this.html;
+        return this.html;
     }
 
     @JavaScriptMethod
     public String exportFileName() {
-	return this.fileName;
+        return this.fileName;
     }
+
     @Override
     public String getIconFileName() {
         return "";
