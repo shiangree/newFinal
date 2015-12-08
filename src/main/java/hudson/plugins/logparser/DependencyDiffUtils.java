@@ -77,6 +77,7 @@ public class DependencyDiffUtils {
             }
             if (!isinlist2)
                 dellist.add(new Dependency(gid1, aid1, ver1));
+
         }
         retlist.put("Deleted", dellist);
         return retlist;
@@ -162,26 +163,25 @@ public class DependencyDiffUtils {
         html.append("<div class=\"center\">\n");
         html.append("<b>Dependency added to build #" + currBuildNumber + "</b><br />\n");
         for (Dependency dep : added) {
-            addDepInfoToHtml(html, dep);
+            html.append("<br> groupId: " + dep.getGroupId() + "</br>\n");
+            html.append("<br> artifactId: " + dep.getArtifactId() + "</br>\n");
+            html.append("<br> version: " + dep.getVersion() + "</br>\n");
+            html.append("<hr>\n<br />\n");
         }
         html.append("</div>\n");
         html.append("<div class=\"right\">\n");
         html.append("<b>Dependency deleted from build #" + prevBuildNumber + "</b><br />\n");
         for (Dependency dep : deleted) {
-            addDepInfoToHtml(html, dep);
+            html.append("<br> groupId: " + dep.getGroupId() + "</br>\n");
+            html.append("<br> artifactId: " + dep.getArtifactId() + "</br>\n");
+            html.append("<br> version: " + dep.getVersion() + "</br>\n");
+            html.append("<hr>\n<br />\n");
         }
         html.append("</div>\n");
         html.append("</div>\n");
         html.append("</body>\n");
         html.append("</html>");
         return html.toString();
-    }
-
-    private static void addDepInfoToHtml(StringBuilder html, Dependency dep) {
-        html.append("<br> groupId: " + dep.getGroupId() + "</br>\n");
-        html.append("<br> artifactId: " + dep.getArtifactId() + "</br>\n");
-        html.append("<br> version: " + dep.getVersion() + "</br>\n");
-        html.append("<hr>\n<br />\n");
     }
 
     /**
@@ -206,6 +206,7 @@ public class DependencyDiffUtils {
             String artifactId = element.getElementsByTagName("artifactId").item(0).getFirstChild().getNodeValue();
             String version = element.getElementsByTagName("version").item(0).getFirstChild().getNodeValue();
             alist.add(new Dependency(groupId, artifactId, version));
+
         }
         return alist;
     }
