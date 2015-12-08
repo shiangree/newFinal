@@ -77,7 +77,6 @@ public class DependencyDiffUtils {
             }
             if (!isinlist2)
                 dellist.add(new Dependency(gid1, aid1, ver1));
-
         }
         retlist.put("Deleted", dellist);
         return retlist;
