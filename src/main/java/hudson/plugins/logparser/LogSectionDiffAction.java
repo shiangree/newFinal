@@ -24,7 +24,6 @@ public class LogSectionDiffAction implements Action {
         try {
             this.html = lsdw.writeSectionDiffToHTMLs();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         this.html += "<br><br>";
